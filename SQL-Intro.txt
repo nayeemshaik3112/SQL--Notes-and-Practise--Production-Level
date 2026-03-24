@@ -1,0 +1,47 @@
+Introduction of MySql
+
+SQL stands for Structured Query Language. It is the language used to communicate with databases. But SQL is different from most languages beginners know.
+
+SEQUEL was the earlier name used historically for the language during early development (it stands for Structured English Query Language).
+SQL (Structured Query Language) is the official name that became the standard.
+People sometimes still say “sequel” in speech, but in writing it’s SQL.
+
+1. Table
+A table is a structured collection of related data stored in rows and columns inside a database. You can think of a table as one sheet in Excel. Each table usually represents one type of real-world thing.
+2. Row / Record
+A row (also called a record) represents one complete entry in a table. Each horizontal row represents one item.
+
+id	    name	        email	                city
+1	    Rahul Mehta	    rahul.mehta@mail.com	Mumbai
+
+ Column / Field
+A column (also called a field) represents one specific attribute or property of the data stored in the table. Each vertical column has a heading.
+
+Relational vs NoSQL Databases
+
+Relational Databases
+Relational databases store data in tables and connect tables using relationships.
+
+In the coaching institute example:
+
+Student table
+Attendance table
+Fees table
+All connected through a common identifier like email. That connection is the relation.
+
+Examples: MySQL, PostgreSQL, Oracle
+NoSQL Databases
+NoSQL databases store data differently:
+
+JSON documents
+Key-value pairs
+Graph structures
+Instead of splitting data across tables and joining, NoSQL often stores related data together for fast access.
+
+Examples: MongoDB
+
+NoSQL prioritizes speed and flexibility.
+
+Relational databases prioritize structure and correctness.
+
+Neither is “better.” They solve different problems.

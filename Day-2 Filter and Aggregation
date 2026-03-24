@@ -1,0 +1,355 @@
+**Day - 2 : Filter Essentials + Aggregation Basics**
+
+---
+
+### Filter Essentials
+
+SQL provides multiple operators to filter data effectively:
+
+* `IS NULL`, `IS NOT NULL` → handle missing data
+* `IN`, `NOT IN` → match values from a list
+* `BETWEEN`, `NOT BETWEEN` → work with ranges
+* `LIKE`, `NOT LIKE` → pattern-based filtering
+
+---
+
+### IS NULL
+
+Used to check if a column has missing value (NULL).
+
+Important understanding:
+
+* NULL ≠ empty string (`''`)
+* NULL ≠ 0
+* NULL ≠ space (`' '`)
+* NULL means unknown / not recorded
+
+```sql
+SELECT 
+     id, 
+     email,
+     city
+FROM users
+WHERE city IS NULL;
+```
+
+---
+
+### IS NOT NULL
+
+Checks if value exists (not NULL).
+
+```sql
+SELECT 
+     id, 
+     email,
+     city
+FROM users
+WHERE city IS NOT NULL;
+```
+
+Note:
+
+* This still includes empty string (`''`) and spaces.
+
+---
+
+### Handling Real-World Data Issues
+
+In production data, missing values appear in different forms:
+
+* NULL
+* empty string (`''`)
+* spaces (`'   '`)
+* placeholder values like `'N/A'`, `'unknown'`
+
+To treat all of these consistently, normalize them:
+
+```sql
+SELECT 
+  id,
+  email,
+  city
+FROM users
+WHERE NULLIF(TRIM(city), '') IS NOT NULL;
+```
+
+Explanation:
+
+* `TRIM(city)` removes spaces
+* `NULLIF(..., '')` converts empty string to NULL
+* Final filter keeps only valid values
+
+---
+
+### IN
+
+Checks if a value matches any value from a list.
+
+```sql
+SELECT 
+  id,
+  email,
+  city
+FROM users
+WHERE city IN ('Delhi', 'Mumbai');
+```
+
+---
+
+### NOT IN
+
+Checks if a value matches none of the values in the list.
+
+```sql
+SELECT 
+  id,
+  email,
+  city
+FROM users
+WHERE city NOT IN ('Delhi', 'Mumbai');
+```
+
+Important:
+
+* If NULL exists in the list or column, `NOT IN` may behave unexpectedly
+* In such cases, prefer `NOT EXISTS`
+
+---
+
+### BETWEEN
+
+Checks whether a value lies inside a range (inclusive).
+
+```sql
+SELECT
+  id,
+  email,
+  signup_at_utc
+FROM users
+WHERE signup_at_utc BETWEEN '2025-12-01 00:00:00'
+                        AND '2025-12-31 23:59:59';
+```
+
+---
+
+### NOT BETWEEN
+
+Checks whether a value lies outside the range.
+
+```sql
+SELECT
+  id,
+  email,
+  signup_at_utc
+FROM users
+WHERE signup_at_utc NOT BETWEEN '2025-12-01 00:00:00'
+                        AND '2025-12-31 23:59:59';
+```
+
+---
+
+### LIKE
+
+Used for pattern matching.
+
+Wildcards:
+
+* `%` → any number of characters
+* `_` → exactly one character
+
+```sql
+SELECT 
+  id,
+  email
+FROM users
+WHERE email LIKE '%@tuf.com';
+```
+
+---
+
+### NOT LIKE
+
+Excludes values matching the pattern.
+
+```sql
+SELECT 
+  id,
+  email
+FROM users
+WHERE email NOT LIKE '%@tuf.com';
+```
+
+---
+
+## Aggregation and Analysis
+
+Used to summarize and analyze data.
+
+Common functions:
+
+* `SUM()`
+* `AVG()`
+* `MIN()`
+* `MAX()`
+* `COUNT()`
+
+---
+
+### GROUP BY
+
+Groups rows based on one or more columns.
+
+```sql
+SELECT project
+FROM employees
+GROUP BY project;
+```
+
+Key points:
+
+* Groups similar values into buckets
+* Returns one row per group
+* Eliminates duplicates for grouped column
+
+---
+
+### SQL Logical Execution Order
+
+SQL is declarative, but internally follows this order:
+
+1. FROM (select table)
+2. WHERE (filter rows)
+3. GROUP BY (create groups)
+4. Aggregate functions (SUM, COUNT, etc.)
+5. HAVING (filter groups)
+6. SELECT (final columns)
+7. ORDER BY (sorting)
+
+---
+
+### MIN and MAX
+
+```sql
+SELECT project,
+       MIN(years_experience) AS min_experience,
+       MAX(years_experience) AS max_experience
+FROM employees
+GROUP BY project;
+```
+
+---
+
+### SUM and AVG
+
+```sql
+SELECT project,
+       SUM(hours_logged) AS total_hours,
+       AVG(years_experience) AS avg_experience
+FROM employees
+GROUP BY project;
+```
+
+---
+
+### HAVING
+
+Filters grouped data after aggregation.
+
+```sql
+SELECT project,
+       SUM(hours_logged) AS total_hours
+FROM employees
+GROUP BY project
+HAVING SUM(hours_logged) > 300;
+```
+
+Difference:
+
+* WHERE filters rows before grouping
+* HAVING filters groups after aggregation
+
+---
+
+## COUNT() in Detail
+
+---
+
+### COUNT(*)
+
+Counts all rows (including NULL values).
+
+```sql
+SELECT COUNT(*) AS total_registrations
+FROM registrations;
+```
+
+---
+
+### COUNT(column)
+
+Counts only non-null values in a column.
+
+```sql
+SELECT COUNT(email) AS emails_provided
+FROM registrations;
+```
+
+---
+
+### COUNT(DISTINCT column)
+
+Counts unique values.
+
+```sql
+SELECT event, COUNT(DISTINCT user_name) AS unique_users
+FROM registrations
+GROUP BY event;
+```
+
+---
+
+### HAVING with COUNT
+
+```sql
+SELECT event, COUNT(*) AS registrations
+FROM registrations
+GROUP BY event
+HAVING COUNT(*) > 3;
+```
+
+Flow:
+
+* Rows grouped by event
+* COUNT(*) applied per group
+* HAVING filters groups based on count
+
+---
+
+## Important Notes
+
+* GROUP BY creates logical groups (buckets)
+
+* SELECT must include:
+
+  * grouped column, or
+  * aggregated value
+
+* COUNT(*) counts all rows
+
+* COUNT(column) ignores NULL values
+
+* NULL handling is critical in real-world data
+
+* NOT IN with NULL can lead to incorrect results
+
+---
+
+## Summary
+
+* Filtering controls rows
+* GROUP BY controls grouping
+* Aggregation summarizes data
+* HAVING filters grouped results
+
+This forms the foundation for most SQL analytics queries.
