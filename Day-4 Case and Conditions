@@ -1,0 +1,150 @@
+What is a CASE Expression?
+CASE expressions is SQL’s way of writing if / else logic inside a query.
+
+You give SQL multiple conditions.
+SQL checks them top to bottom.
+It returns the first matching result.
+If nothing matches:
+Returns the ELSE value (if provided)
+Otherwise returns NULL
+CASE is an expression, not a statement.
+
+Syntax:
+
+CASE
+  WHEN condition1 THEN value1
+  WHEN condition2 THEN value2
+  ELSE fallback_value
+END
+
+
+SET @temp_age = 19;
+
+SELECT 
+    CASE 
+        WHEN @temp_age >= 18 THEN 'Adult'
+        ELSE 'Not an Adult'
+    END AS result;
+
+Searched CASE - Boolean conditions (>, <, BETWEEN, IS NULL, multiple rules) -	score < 40 -> Fail or score ≥ 40 -> Pass
+
+Simple CASE	  - Equality-style matching (= against fixed values)	        -    status = 'P' , Pending or status = 'D' , Delivered
+
+
+Example Query:
+
+SELECT
+  product_id,
+  name,
+  price,
+  CASE
+    WHEN price IS NULL THEN 'Missing Price'
+    WHEN price <= 20 THEN 'Budget'
+    WHEN price > 20 AND price <= 100 THEN 'Mid Range'
+    WHEN price > 100 THEN 'Premium'
+  END AS price_category
+FROM products;
+
+Boolean Evaluation with CASE
+CASE can evaluate conditions and return explicit results such as PASS or FAIL.
+
+SELECT
+  rule_id,
+  value,
+  CASE
+    WHEN value IS NULL THEN 'Missing'
+    WHEN value >= 40 THEN 'PASS'
+    ELSE 'FAIL'
+  END AS verdict
+FROM rules;
+
+NULL Comparisons
+
+In SQL, comparisons don’t result only in TRUE or FALSE, they can also return UNKNOWN (NULL).
+
+SELECT
+  NULL = NULL     AS eq_null_null,     -- NULL (unknown)
+  NULL <=> NULL   AS nullsafe_eq,      -- 1 (true)
+  NULL = 5        AS eq_null_5,        -- NULL (unknown)
+  NULL <=> 5      AS nullsafe_eq_5,    -- 0 (false)
+  (NULL >= 60)    AS ge_null_60;       -- NULL (unknown)
+
+NULL = NULL does not return TRUE, the result is UNKNOWN (NULL)
+
+IS NULL is the correct way to check for NULL values
+
+In MySQL, <=> is a NULL-safe equality operator that safely compares values, even when NULL is involved
+It means when any user_name in the table is Null then with <=> we can say that if  WHEN username <=> NULL THEN 'Not Filled' 
+
+SELECT
+  user_id,
+  username,
+  CASE
+    WHEN username <=> NULL THEN 'Not Filled' -> <=> then it is null then Not Filled
+    WHEN username = '' THEN 'Empty' -> empty then it is empty
+    ELSE username
+  END AS username_display
+FROM users;
+
+Bonus Calculation using CASE and COALESCE
+COALESCE provides safe fallback values when data is missing.
+
+
+SELECT
+  emp_id,
+  salary,
+  performance_score,
+  CASE
+    WHEN COALESCE(performance_score, -1) = -1 THEN 0
+    WHEN performance_score >= 90 THEN salary * 0.20
+    WHEN performance_score >= 75 THEN salary * 0.10
+    ELSE salary * 0.05
+  END AS bonus_amount
+FROM employees
+ORDER BY emp_id;
+
+COALESCE(performance_score, -1) -> performance_score is not presen then -1 , not presen means null not emoty or ''
+
+Node Classification
+CASE can classify hierarchical records such as root, internal, and leaf nodes.
+
+SELECT
+    node_id,
+    parent_id,
+    CASE
+        WHEN parent_id IS NULL THEN 'ROOT'
+        WHEN NOT EXISTS (
+            SELECT 1      
+            FROM nodes n2
+            WHERE n1.node_id = n2.parent_id
+        ) THEN 'LEAF'
+        ELSE 'INTERNAL'
+    END AS node_type
+FROM nodes n1;
+
+Assume table:
+node_id	    parent_id
+1	           NULL
+2	            1
+3	            1
+4	            2
+
+if 1 is the node_id then it will compare with parent_id if 1 is present if yes then it is not leaf node, it is internal
+2 has 1 , 3 has 1 then compare 4 , 4 is not present so it is leaf 
+
+Always think like this:
+
+For each node:
+    Check → "Am I someone’s parent?"
+YES → has children → INTERNAL
+NO → no children → LEAF
+
+Conditional Aggregation
+CASE can be used inside aggregate functions to split metrics by condition.
+
+SELECT
+  SUM(CASE WHEN item = 'apple'  THEN COALESCE(quantity, 0) ELSE 0 END) AS apples_sold,
+  SUM(CASE WHEN item = 'orange' THEN COALESCE(quantity, 0) ELSE 0 END) AS oranges_sold
+FROM sales;
+
+if present then sum it if not it means it is null then it become 0 then add 0
