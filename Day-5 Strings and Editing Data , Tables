@@ -1,0 +1,265 @@
+Table 1 — Mandatory & Important SQL Topics (High Priority)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Category                    | Topics                                                                 | Priority Level | Why Important                                     |
+|-----------------------------|------------------------------------------------------------------------|----------------|---------------------------------------------------|
+| Foundations                 | DB basics, Tables, PK, FK, Constraints                                 | MUST           | Core understanding of data structure              |
+| Query Basics                | SELECT, WHERE, ORDER BY, LIMIT, DISTINCT                               | MUST           | Base of all SQL queries                           |
+| Filtering                   | AND, OR, NOT, IN, BETWEEN, LIKE                                        | MUST           | Used in almost every query                        |
+| Aggregations                | COUNT, SUM, AVG, MIN, MAX, GROUP BY, HAVING                            | MUST           | Very frequent in interviews                       |
+| Joins                       | INNER JOIN, LEFT JOIN, RIGHT JOIN, SELF JOIN                           | MUST           | Most asked topic (70% interviews)                 |
+| Subqueries                  | Scalar, Correlated, EXISTS, NOT EXISTS                                 | MUST           | Advanced querying logic                           |
+| CTE (WITH)                  | WITH clause                                                            | IMPORTANT      | Cleaner alternative to subqueries                 |
+| Functions (Conditional)     | CASE WHEN, COALESCE, IFNULL                                            | MUST           | Used for logic handling                           |
+| String Functions            | LENGTH, SUBSTRING, CONCAT, TRIM, REPLACE                               | IMPORTANT      | Data cleaning & transformation                    |
+| Date Functions              | CURRENT_DATE, DATE_ADD, DATE_SUB, DATEDIFF                             | IMPORTANT      | Real-world data handling                          |
+| Window Functions            | ROW_NUMBER, RANK, DENSE_RANK, PARTITION BY                             | VERY IMPORTANT | High-level interview + real-world use             |
+| Set Operations              | UNION, UNION ALL                                                       | IMPORTANT      | Combining result sets                             |
+| Data Manipulation           | INSERT, UPDATE, DELETE                                                 | MUST           | CRUD operations                                   |
+| Transactions                | COMMIT, ROLLBACK, ACID                                                 | IMPORTANT      | Backend + consistency handling                    |
+| Basic Performance           | Index basics, EXPLAIN                                                  | IMPORTANT      | Improves query efficiency                         |
+| Database Design             | Normalization, Relationships (1-1, 1-M, M-M)                           | IMPORTANT      | System design + schema building                   |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Table 2 — Less Priority / Optional Topics
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Category                    | Topics                                                                 | Priority Level | Why Less Priority                                 |
+|-----------------------------|------------------------------------------------------------------------|----------------|---------------------------------------------------|
+| JSON in SQL                 | JSON functions, JSON queries                                           | OPTIONAL       | Used only in specific use cases                   |
+| Advanced Access Control     | Roles, Permissions, Grants                                             | OPTIONAL       | Mostly DBA responsibility                         |
+| Advanced Transactions       | Isolation levels (deep dive)                                           | OPTIONAL       | Basic knowledge is enough                         |
+| Storage Internals           | Disk storage, page structure, indexing internals                       | LOW            | Rarely asked in interviews                        |
+| Database Scaling            | Sharding, Replication, Partitioning                                    | LOW            | Needed for senior/system design roles             |
+| Advanced Set Operations     | INTERSECT, EXCEPT                                                      | LOW            | Rarely used in real-world queries                 |
+| Temporary Structures        | Temp tables (deep usage)                                               | OPTIONAL       | Not frequently asked                              |
+| Advanced Optimization       | Query planner internals, cost-based optimization                       | LOW            | Deep DB-level knowledge                           |
+| Vendor-Specific Features    | MySQL/Postgres-specific features                                       | OPTIONAL       | Depends on company/project                        |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+String Functions
+
+In real databases, text data is rarely clean or consistent. You will see:
+
+Different letter cases (Apple, apple, APPLE)
+Accents (café, cafe)
+Extra spaces
+Mixed formats
+
+String functions help us normalize, format, and filter text data so that comparisons, searches, and reports behave correctly. But before using string functions, it is very important to understand how SQL treats strings internally.
+
+In SQL, a string is not just characters. Every string value is stored with the actual text and collation rules that decide how text is compared, sorted, matched. That’s why two strings that look different may still be treated as equal.
+
+| Flag | Meaning             | What it controls              | Example comparison | Result     |
+|------|--------------------|------------------------------|--------------------|------------|
+| ai   | Accent-Insensitive | Ignores accents (é, è, ñ)    | cafe vs café       | Equal      |
+| as   | Accent-Sensitive   | Respects accents             | cafe vs café       | Not equal  |
+| ci   | Case-Insensitive   | Ignores letter case          | Apple vs apple     | Equal      |
+| cs   | Case-Sensitive     | Respects letter case         | Apple vs apple     | Not equal  |
+
+CONCAT() vs CONCAT_WS()
+CONCAT(a,b,c...) joins strings as-is
+CONCAT_WS(sep, a,b,c...) joins strings with a separator (WS = with separator) and skips NULL values
+Examples:
+
+SELECT CONCAT('Hello', ' ', 'Raj');
+Output: Hello Raj
+----------------------------------------------------------------------
+SELECT CONCAT('Hello', NULL, 'Raj');
+Output: NULL
+CONCAT() returns NULL if any argument is NULL.
+----------------------------------------------------------------------
+SELECT CONCAT_WS(' ', 'Hello', NULL, 'Raj');
+Output: Hello Raj
+CONCAT_WS() ignores NULLs.
+----------------------------------------------------------------------
+SELECT CONCAT_WS('. ', NULL, 'Hi', 'Raj');
+Output: Hi. Raj
+NULL skipped, separator applied only between real values.
+
+Use CONCAT() when you’re sure there’s no NULL; use CONCAT_WS() when NULLs may exist.
+----------------------------------------------------------------------
+
+LOWER() / UPPER()
+LOWER() converts text to lowercase
+UPPER() converts text to uppercase
+
+SELECT LOWER('RAjstriveR');
+SELECT UPPER('RAjstriveR');
+----------------------------------------------------------------------
+TRIM() / LTRIM() / RTRIM()
+TRIM() removes spaces from both sides
+LTRIM() removes spaces from left only
+RTRIM() removes spaces from right only
+
+SELECT TRIM('  RAJ  ');
+SELECT LTRIM(' RAJ ');
+SELECT RTRIM(' RAJ ');
+----------------------------------------------------------------------
+LENGTH() vs CHAR_LENGTH()
+LENGTH() → number of bytes
+CHAR_LENGTH() → number of characters
+
+SELECT LENGTH('RAJ'); - 3
+SELECT LENGTH('é');   - 2
+SELECT LENGTH('😀'); - 4 emoji is 4 length character , length calculates with bytes 
+
+SELECT CHAR_LENGTH('RAJ'); - 3
+SELECT CHAR_LENGTH('é');   - 1
+SELECT CHAR_LENGTH('😀');  - 1
+----------------------------------------------------------------------
+ LEFT() / RIGHT() / SUBSTRING()
+
+LEFT(str, n) = first n characters
+RIGHT(str, n) = last n characters
+SUBSTRING(str, start, len) = slice string
+
+SELECT LEFT('plus_user', 3); - plu
+SELECT RIGHT('plus_user', 4); - user
+SELECT SUBSTRING('plus_user', 3); - us_user
+SSELECT SUBSTRING('plus_user', 3, 2); - us
+----------------------------------------------------------------------
+LOCATE() / INSTR()
+LOCATE(substr, str)
+INSTR(str, substr)
+1-based indexing
+Returns 0 if not found
+
+SELECT LOCATE('@', 'Raj@gmail.com'); - 4
+SELECT INSTR('Raj@gmail.com', '@');  - 4
+SELECT INSTR('Raj@gmail.com', '7');  - 0
+----------------------------------------------------------------------
+REPLACE() Replaces all occurrences of a substring. 
+
+SELECT REPLACE('a_b_c', '_', '-');
+
+Output: a-b-c
+----------------------------------------------------------------------
+LIKE Pattern Matching
+
+Wildcards
+
+% = any length
+_ = exactly one character
+
+SELECT 'plus_user' LIKE 'plus%'; - 'plus%' → starts with plus, anything after is allowed
+SELECT 'plus1user' LIKE 'plus_us_r'; - Matches exactly 1 character (not 0, not many) first_ matches with _ and second matches with e only one character
+
+escape the wildcars then use SELECT 'plus1user' LIKE 'plus\_user';
+Note: Escaping wildcards (\_ , \%) depends on SQL mode.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Editing Data and Tables
+
+Every real application needs to add new information, update existing records, and remove outdated or incorrect data. This is where SQL’s DML (Data Manipulation Language) commands come into play.
+
+1. INSERT
+INSERT is used to add new rows into a table.
+INSERT INTO employees (emp_id, name, department, salary, hire_date, is_active) VALUES
+(301, 'Neha Sharma',  'Sales',55000.00, '2024-03-11', TRUE);
+----------------------------------------------------------------------------------------------
+UPSERT
+UPSERT is a database operation that inserts a new record if it does not exist, or updates the existing record if it already exists based on a unique or primary key constraint.In simple terms, “Insert the row if it is new; otherwise, update the existing row.”
+----------------------------------------------------------------------------------------------
+INSERT INTO employees (emp_id, name, department, salary, hire_date, is_active)
+VALUES (301, 'Raj Sharma', 'Eng', 57000.00, '2029-01-01', TRUE)
+AS new_record
+ON DUPLICATE KEY UPDATE
+  name        = new_record.name,
+  department  = new_record.department,
+  salary      = new_record.salary,
+  hire_date   = new_record.hire_date,
+  is_active   = new_record.is_active;
+
+----------------------------------------------------------------------------------------------
+UPDATE
+UPDATE changes values in existing rows.
+
+UPDATE employees
+SET department = 'HR';
+
+
+This query updates every row in the table. Since no WHERE clause is used, all employees are assigned to the HR department. This is considered dangerous in production systems.
+UPDATE employees
+SET department = 'Eng'
+WHERE employee_id = 305;
+
+UPDATE employees
+SET department = 'HR',
+    salary = 65000
+WHERE employee_id = 305;
+
+
+UPDATE employees
+SET salary = salary * 1.5
+WHERE hire_date >= '2024-01-01';
+
+----------------------------------------------------------------------------------------------
+DELETE
+DELETE removes one or more rows from a table.
+
+DELETE a Single Row
+
+DELETE FROM employees
+WHERE emp_id = 305;
+
+DELETE FROM employees
+WHERE employee_id IN (301, 302); 
+
+DELETE FROM employees; but still row is present with empty values
+----------------------------------------------------------------------------------------------
+ALTER
+The ALTER statement is used to modify the structure of an existing table without deleting the table or its data.
+
+Assume below base table before ALTER operations
+
+ALTER TABLE employees
+ADD COLUMN temp_check INT;
+
+
+UPDATE employees
+SET temp_check = 10;
+
+ALTER TABLE employees
+RENAME TO employees_v2;
+
+ALTER TABLE employees_v2
+RENAME COLUMN temp_check TO temp_check_v2;
+
+
+ALTER TABLE employees
+DROP COLUMN temp_check;
+----------------------------------------------------------------------------------------------
+CHANGE Clause
+
+Renames a column and can also change its datatype and constraints at the same time.
+
+Column name must be specified twice (old and new)
+Datatype must be redefined, even if unchanged
+Can modify constraints (NOT NULL, DEFAULT, etc.)
+
+ALTER TABLE employees
+CHANGE salary monthly_salary DECIMAL(10,2);
+----------------------------------------------------------------------------------------------
+MODIFY Clause
+
+Changes the datatype or constraints of a column while keeping the column name the same.
+
+ALTER TABLE table_name
+MODIFY column_name new_data_type;
+
+ALTER TABLE table_name
+MODIFY column_name new_data_type;
+If you only want to change the datatype or constraints, use MODIFY. Use CHANGE only when renaming the column is explicitly required. Many production bugs happen due to accidental column renaming with CHANGE.
+----------------------------------------------------------------------------------------------
+TRUNCATE
+TRUNCATE is a Data Definition Language (DDL) operation used to remove all rows from a table quickly and efficiently.
+
+Remove all rows from a table
+Reset the table to an empty state
+Perform faster than DELETE without WHERE
+
+		DELETE				TRUNCATE			DROP
+Best use-       Remove specific records		Reset / clear table quickly	Remove table permanently
+----------------------------------------------------------------------------------------------
