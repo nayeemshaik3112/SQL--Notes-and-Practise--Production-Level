@@ -1,0 +1,107 @@
+JOINS:
+
+A RIGHT JOIN :
+returns all rows from the right table, and matching rows from the left table. If no match exists, the left table’s columns become NULL.
+
+customer_id | name
+------------|-------
+101         | Aisha
+102         | Rohan
+103         | Meera
+104         | Arjun
+
+customer_id | order
+------------|------
+101         | A
+102         | B
+105         | C
+
+select
+c.customer_id,
+c.name,
+o.order
+from customers C
+right join order o
+on c.customer_id = o.customer_id;
+
+output:
+customer_id | name  | order
+------------|-------|------
+101         | Aisha | A
+102         | Rohan | B
+NULL        | NULL  | C
+
+All rows from right table (orders) no matter what , all will be printed even no matches
+Matching rows from left table (customers) which matches if not nulllllllll
+-------------------------------------------------------------------------
+
+SELECT
+    o.order_id,
+    o.order_code,
+    o.status,
+    o.total_amount,
+    o.customer_id,
+    c.name AS customer_name
+FROM customers c            - LEFT
+RIGHT JOIN orders o         - RIGHT
+    ON c.customer_id = o.customer_id
+ORDER BY o.order_id;
+
+from orders table select the id, code .... etc things and from customers c right join the orders o 
+and compare it with customer_id with c means c.customer_id = o.customer_id means o refers to right side table
+order means either asc order or desc order
+if not order by then won't get in ordered way 
+same like order by order_id asc or desc
+
+if any id is null in orders table , because order is right table , null id will also printed
+
+🔹 Rule (Golden Rule)
+
+👉 The table written after FROM = LEFT
+👉 The table written after JOIN = RIGHT
+----------------------------------------------------------------------
+if we want only the paid orders
+
+SELECT
+    o.order_id,
+    o.order_code,
+    o.status,
+    o.total_amount,
+    c.name AS customer_name,
+    c.city
+FROM customers c
+RIGHT JOIN orders o
+    ON c.customer_id = o.customer_id
+WHERE o.status = 'PAID'
+ORDER BY o.order_id;
+
+Filtering with WHERE o.status = 'PAID' keeps only PAID orders, but still preserves unmatched orders because the filter is applied on the right table (orders).
+
+----------------------------------------------------------------------
+if we want to order it with Delhi
+
+SELECT 
+    o.order_code,
+    c.customer_id, 
+    c.city
+FROM customers c
+RIGHT JOIN orders o
+    ON c.customer_id = o.customer_id
+    AND c.city = 'Delhi';
+
+
+Here, c.city = 'Delhi' is inside the JOIN condition, MySQL will match a customer row only if customer_id matches, and that customer’s city is Delhi
+
+For orders whose customer is not Delhi / missing / NULL, the customer columns become NULL.
+----------------------------------------------------------------------
+
+Aspect	                    ON (Join Condition)                 	            WHERE (Filter Condition)
+---------------------------------------------------------------------------------------------------------------------------
+When it is applied	        During matching of rows while joining	            After the join result is produced
+
+Main purpose	            Defines how rows from two tables should match	    Defines which joined rows should remain in final output
+
+Best for	                Keeping all rows from left/right table but          Filtering final output based on conditions
+                            controlling what matches	
+---------------------------------------------------------------------------------------------------------------------------
+ON is like compare the id where means, which thing needs to be compared ON -> ID's , i will join with ID'S in those ID's What should match that tells WHERE , status is paid
