@@ -1,0 +1,69 @@
+Merging Query Results
+UNION is one of those SQL topics that triggers school memories: set theory, merging lists, intersection. 
+That familiarity is comforting, and also dangerous. Because most learners treat UNION like a simple “add these two tables” button. But SQL isn’t only about combining data. It’s about combining results with meaning intact.
+
+UNION
+UNION combines results from two or more SELECT statements and removes duplicate rows.
+
+That last part matters more than people realize.
+
+When you run UNION, you’re not telling SQL: “Append table B to table A.”
+
+You’re telling SQL: “Create one combined result set, and ensure rows are unique.”
+
+That means UNION is doing two jobs:
+
+Concatenation of results
+Duplicate elimination
+
+lets say we have 2 tables with name
+
+ironman
+spiderman
+
+spiderman
+thor
+
+Union will do - spiderman, thor, ironman
+
+The simplest way to feel UNION is through your superhero example:
+
+Table A: Iron Man, Spider-Man
+Table B: Spider-Man, Thor
+When you union them:
+
+Iron Man appears once
+Spider-Man appears once (duplicate removed)
+Thor appears once
+So UNION keeps one occurrence of duplicates.
+
+But here’s the deeper lesson:
+
+SQL decides duplicates by comparing the entire row.
+
+Not “just the name.”
+Not “just the ID.”
+
+The full row, position-by-position.
+------------------------------------------------------------------------------
+UNION ALL
+UNION ALL merges results but does not remove duplicates.
+
+So it’s faster. Why?
+
+Because duplicate elimination is work. SQL must compare rows and filter them out.
+
+So UNION ALL is your choice when:
+
+You actually want every row preserved
+Duplicates are meaningful
+You care about speed and will handle uniqueness later if needed
+
+same example we will get for UNION ALL -> spiderman, spiderman, thor, ironman
+--------------------------------------------------------------------
+Feature	        UNION	                        UNION ALL
+--------------------------------------------------------------------
+Duplicates	    Removes duplicates	            Keeps duplicates
+Performance	    Slower (due to deduplication)	Faster (no deduplication)
+Use Case	    When unique records are required	When all records are needed
+--------------------------------------------------------------------
