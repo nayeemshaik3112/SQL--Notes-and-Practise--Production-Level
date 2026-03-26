@@ -105,3 +105,116 @@ Best for	                Keeping all rows from left/right table but          Fil
                             controlling what matches	
 ---------------------------------------------------------------------------------------------------------------------------
 ON is like compare the id where means, which thing needs to be compared ON -> ID's , i will join with ID'S in those ID's What should match that tells WHERE , status is paid
+
+LEFT JOIN
+A LEFT JOIN returns all rows from the left table, and matching rows from the right table. If no match exists, the right table’s columns become NULL
+
+SELECT
+  c.customer_id,
+  c.name,
+  o.order_id,
+  o.order_code
+FROM customers c
+LEFT JOIN orders o
+  ON o.customer_id = c.customer_id;
+----------------------------------------------------------------------
+INNER JOIN
+INNER JOIN returns only those rows where there is a matching value in both tables based on a join condition.
+
+SELECT
+  c.customer_id,
+  c.name,
+  COUNT(*) AS orders_count
+FROM customers c
+INNER JOIN orders o
+  ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;
+
+what ever the id's matching from left and right , count only those rows. 
+
+Revenue per customer
+
+SELECT
+  c.customer_id,
+  c.name,
+  SUM(o.total_amount) AS revenue
+FROM customers c
+INNER JOIN orders o
+  ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name;
+----------------------------------------------------------------------
+FULL OUTER JOIN
+Retrieves all rows from both tables. If there is a match, it returns the matched rows.
+
+SELECT
+  s.student_id,
+  s.name,
+  p.amount
+FROM students s
+LEFT JOIN payments p
+  ON p.student_id = s.student_id
+
+UNION
+
+SELECT
+  p.student_id,
+  s.name,
+  p.amount
+FROM students s
+RIGHT JOIN payments p
+  ON p.student_id = s.student_id
+WHERE s.student_id IS NULL;
+----------------------------------------------------------------------
+CROSS JOIN
+A CROSS JOIN produces the Cartesian product of two tables. 
+That means every row from customers pairs with every row from orders, generating m × n rows.
+It is rare in everyday CRUD queries, but useful when you want all combinations (e.g., all customer–coupon pairs, all dates × products, generating test grids).
+
+SELECT COUNT(*)
+FROM customers c
+CROSS JOIN orders o;
+----------------------------------------------------------------------
+IMPLICIT JOIN
+An implicit join is the old-style way of writing joins using a comma-separated FROM clause. The actual matching condition is written in the WHERE clause.
+
+SELECT
+  c.customer_id,
+  c.name,
+  o.order_code,
+  o.status
+FROM customers c, orders o
+WHERE c.customer_id = o.customer_id;
+
+eveything is same just on logic is diff
+----------------------------------------------------------------------
+SELF JOIN
+A SELF JOIN is when a table is joined with itself. It is commonly used to represent hierarchies such as: employee → manager
+
+In an employee hierarchy, both the employee and the manager are stored in the same table, so we use two aliases to treat it like two different tables.
+
+SELECT
+    e.emp_name AS employee,
+    m.emp_name AS manager
+FROM employees e
+JOIN employees m
+    ON e.manager_id = m.emp_id
+    ORDER BY e.emp_id;;
+
+if any of the manager data is null then that employee will not be included as manager is missing
+
+we will use the same table twice but we will use it for emp and for manager
+----------------------------------------------------------------------
+NATURAL JOIN
+A NATURAL JOIN automatically joins two tables by matching all columns that have the same name in both tables. Useful when both tables share a common column name and you want an automatic join without writing ON
+
+SELECT 
+  c.customer_id,
+  cl.tier
+FROM customers AS c
+NATURAL JOIN customer_loyalty AS cl
+ORDER BY c.customer_id;
+
+Note: NATURAL JOIN can be risky in real projects because:
+
+If later both tables gain another same-named column (e.g. name), the join will silently start matching on both columns.
+This can change results without warning.
