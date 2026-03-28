@@ -1,107 +1,55 @@
-What Are Subqueries
-A subquery is simply a SELECT statement written inside another SQL statement.
+Extracting Date Parts
 
-Outer query = the main query you run.
-Inner query = the SELECT written inside it.
-SQL evaluates the inner query first, then uses its result to finish the outer query.
+SQL provides functions to extract components such as year and month from date values.
 
-select 
-  o.order_id;
-(select u.username from users u where u.userid = o.user_id) as name
-from orders o
+SET @date_temp = DATE('2029-08-19');
+SET @datetime_temp = TIMESTAMP('2029-05-18 12:50:45');
 
-sub query with in 
+@date_temp contains only a date (YYYY-MM-DD)
+@datetime_temp contains both date and time (YYYY-MM-DD HH:MM:SS)
 
-SELECT u.user_id
-FROM users u
-WHERE u.user_id IN (
-  SELECT DISTINCT o.user_id
-  FROM orders o
-);
-------------------------------------------------------------------
-Inner query gets all unique user_ids that appear in orders. Outer query returns only those users whose user_id is in that list.
+Method 1: Direct Functions (Most Commonly Used)
 
-select o.user_id, o.product_id
-from orders o
-where o.product_id in (
-  select p.product_id 
-  from products p 
-  where p.product = 'tablet'
-);
-
-first inner query executes , it takes all the product with tablet
-then compares in the orders table where this product_id is present in there
-------------------------------------------------------------------
-EXISTS
-checks whether a subquery returns at least one row. 
-The database stops searching as soon as a match is found. Because the actual values are irrelevant, SELECT 1 is commonly used.
+This is the simplest and most widely used approach. SQL provides direct functions for each date/time component.
 
 SELECT
-  u.user_id,
-  u.name
-FROM users u
-WHERE EXISTS (
-  SELECT 1
-  FROM orders o
-  WHERE o.user_id = u.user_id
-);
+    YEAR(@date_temp)  AS year,
+    MONTH(@date_temp) AS month,
+    DAY(@date_temp)   AS day;
 
+YEAR() extracts the year part = 2029
+MONTH() extracts the month part = 8
+DAY() extracts the day part = 19
 
-SELECT u.user_id
-FROM users u
-WHERE EXISTS (
-  SELECT 1
-  FROM orders o
-  WHERE o.user_id = u.user_id
-    AND o.amount >= 500
-);
-
-EXISTS returns TRUE/FALSE, not rows. It stops as soon as it finds the first matching order (efficient). The subquery is correlated: it uses u.user_id from the outer query.
-------------------------------------------------------------------
-NOT EXISTS
-NOT EXISTS ensures that no matching row exists. This pattern is the most reliable way to express all products or none missing logic.
+Extracting from a DATETIME / TIMESTAMP value
 
 SELECT
-  u.user_id,
-  u.name
-FROM users u
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM orders o
-  WHERE o.user_id = u.user_id
-);
+    HOUR(@datetime_temp)   AS hour,
+    MINUTE(@datetime_temp) AS minute,
+    SECOND(@datetime_temp) AS second;
 
 
-SELECT
-  u.user_id,
-  u.name
-FROM users u
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM products p
-  WHERE NOT EXISTS (
-    SELECT 1
-    FROM orders o
-    WHERE o.user_id = u.user_id
-      AND o.product_id = p.product_id
-  )
-);
-------------------------------------------------------------------
-Correlated Subquery
-A correlated subquery references columns from the outer query. The inner query executes once for each row processed by the outer query.
+HOUR() extracts the hour = 12
+MINUTE() extracts the minute = 50
+SECOND() extracts the seconds = 45
 
-SELECT
-  u.user_id,
-  u.name,
-  (
-    SELECT MAX(o.amount)
-    FROM orders o
-    WHERE o.user_id = u.user_id
-  ) AS max_amount
-FROM users u
-WHERE EXISTS (
-  SELECT 1
-  FROM orders o
-  WHERE o.user_id = u.user_id
-)
-ORDER BY max_amount DESC;
+
+Most important interview trap question
+
+WHERE login_time >= '2029-01-01 00:00:00'
+  AND login_time <= '2029-01-31 00:00:00';
+
+
+Why This Is Wrong
+
+This condition includes only the first second of January 31st. Any login after midnight on Jan 31 is excluded, for example:
+
+2029-01-31 09:45:00
+2029-01-31 18:30:12
+2029-01-31 23:59:59
+
+this wonot capture 31 st time 
+
+Correct and Recommended Pattern (Best Practice), use an inclusive start and an exclusive end (half-open interval):
+WHERE login_time >= '2029-01-01 00:00:00'
+  AND login_time <  '2029-02-01 00:00:00'
