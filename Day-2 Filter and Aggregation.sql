@@ -268,8 +268,6 @@ Difference:
 
 ## COUNT() in Detail
 
-------------------------------------------------------------------------------------------
-
 ### COUNT(*)
 
 Counts all rows (including NULL values).
