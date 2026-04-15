@@ -8,7 +8,6 @@ If nothing matches:
 Returns the ELSE value (if provided)
 Otherwise returns NULL
 CASE is an expression, not a statement.
-
 Syntax:
 
 CASE
