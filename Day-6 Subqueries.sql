@@ -1,10 +1,13 @@
+A subquery is a select statement written inside another sql query and then sub query is first evalulates the inner query first
+then uses the result while executing the outer query
+
 What Are Subqueries
 A subquery is simply a SELECT statement written inside another SQL statement.
 
 Outer query = the main query you run.
 Inner query = the SELECT written inside it.
 SQL evaluates the inner query first, then uses its result to finish the outer query.
-
+------------------------------------------------------------------
 select 
   o.order_id;
 (select u.username from users u where u.userid = o.user_id) as name
@@ -18,6 +21,29 @@ WHERE u.user_id IN (
   SELECT DISTINCT o.user_id
   FROM orders o
 );
+------------------------------------------------------------------
+Scalar Subquery Example:
+
+If we have lot of products and their amounts I need to get the product where the amount is > avg amount
+
+first - inner query 
+select avg(o1.amount) from orders o1
+second - outer query + inner query
+
+select 
+  o.order_id,
+  o.product_id,
+  o.amount
+from orders as o
+where o.amount > (select avg(o1.amount) from orders o1)
+
+Column Subquery
+Imagine I have users table which has user_id and also orders table which has order_id
+
+select 
+  u.user_id
+  from users as u
+  where u.user_id in (select distinct(o.order_id) from orders as o)
 ------------------------------------------------------------------
 Inner query gets all unique user_ids that appear in orders. Outer query returns only those users whose user_id is in that list.
 

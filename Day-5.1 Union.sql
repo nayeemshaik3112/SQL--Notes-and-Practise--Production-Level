@@ -1,15 +1,16 @@
 Merging Query Results
 UNION is one of those SQL topics that triggers school memories: set theory, merging lists, intersection. 
-That familiarity is comforting, and also dangerous. Because most learners treat UNION like a simple “add these two tables” button. But SQL isn’t only about combining data. It’s about combining results with meaning intact.
+That familiarity is comforting, and also dangerous. Because most learners treat UNION like a simple “add these two tables” button. But SQL isnt only about combining data. 
+Its about combining results with meaning intact.
 
 UNION
 UNION combines results from two or more SELECT statements and removes duplicate rows.
 
 That last part matters more than people realize.
 
-When you run UNION, you’re not telling SQL: “Append table B to table A.”
+When you run UNION, youre not telling SQL: “Append table B to table A.”
 
-You’re telling SQL: “Create one combined result set, and ensure rows are unique.”
+Youre telling SQL: “Create one combined result set, and ensure rows are unique.”
 
 That means UNION is doing two jobs:
 
@@ -37,7 +38,7 @@ Spider-Man appears once (duplicate removed)
 Thor appears once
 So UNION keeps one occurrence of duplicates.
 
-But here’s the deeper lesson:
+But heres the deeper lesson:
 
 SQL decides duplicates by comparing the entire row.
 
@@ -49,7 +50,7 @@ The full row, position-by-position.
 UNION ALL
 UNION ALL merges results but does not remove duplicates.
 
-So it’s faster. Why?
+So its faster. Why?
 
 Because duplicate elimination is work. SQL must compare rows and filter them out.
 

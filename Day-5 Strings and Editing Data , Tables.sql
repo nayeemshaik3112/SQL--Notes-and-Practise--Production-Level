@@ -109,7 +109,6 @@ SELECT 'plus1user' LIKE 'plus_us_r'; - Matches exactly 1 character (not 0, not m
 escape the wildcars then use SELECT 'plus1user' LIKE 'plus\_user';
 Note: Escaping wildcards (\_ , \%) depends on SQL mode.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Editing Data and Tables
 
 Every real application needs to add new information, update existing records, and remove outdated or incorrect data. This is where SQL’s DML (Data Manipulation Language) commands come into play.

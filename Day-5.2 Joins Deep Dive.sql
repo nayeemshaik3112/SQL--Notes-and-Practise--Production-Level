@@ -50,7 +50,7 @@ ORDER BY o.order_id;
 from orders table select the id, code .... etc things and from customers c right join the orders o 
 and compare it with customer_id with c means c.customer_id = o.customer_id means o refers to right side table
 order means either asc order or desc order
-if not order by then won't get in ordered way 
+if not order by then wont get in ordered way 
 same like order by order_id asc or desc
 
 if any id is null in orders table , because order is right table , null id will also printed
@@ -72,10 +72,10 @@ SELECT
 FROM customers c
 RIGHT JOIN orders o
     ON c.customer_id = o.customer_id
-WHERE o.status = 'PAID'
+WHERE o.status = PAID
 ORDER BY o.order_id;
 
-Filtering with WHERE o.status = 'PAID' keeps only PAID orders, but still preserves unmatched orders because the filter is applied on the right table (orders).
+Filtering with WHERE o.status = PAID keeps only PAID orders, but still preserves unmatched orders because the filter is applied on the right table (orders).
 
 ----------------------------------------------------------------------
 if we want to order it with Delhi
@@ -87,10 +87,10 @@ SELECT
 FROM customers c
 RIGHT JOIN orders o
     ON c.customer_id = o.customer_id
-    AND c.city = 'Delhi';
+    AND c.city = Delhi;
 
 
-Here, c.city = 'Delhi' is inside the JOIN condition, MySQL will match a customer row only if customer_id matches, and that customer’s city is Delhi
+Here, c.city = Delhi is inside the JOIN condition, MySQL will match a customer row only if customer_id matches, and that customer’s city is Delhi
 
 For orders whose customer is not Delhi / missing / NULL, the customer columns become NULL.
 ----------------------------------------------------------------------
@@ -104,7 +104,7 @@ Main purpose	            Defines how rows from two tables should match	    Defin
 Best for	                Keeping all rows from left/right table but          Filtering final output based on conditions
                             controlling what matches	
 ---------------------------------------------------------------------------------------------------------------------------
-ON is like compare the id where means, which thing needs to be compared ON -> ID's , i will join with ID'S in those ID's What should match that tells WHERE , status is paid
+ON is like compare the id where means, which thing needs to be compared ON -> IDs , i will join with IDS in those IDs What should match that tells WHERE , status is paid
 
 LEFT JOIN
 A LEFT JOIN returns all rows from the left table, and matching rows from the right table. If no match exists, the right table’s columns become NULL
@@ -130,7 +130,7 @@ INNER JOIN orders o
   ON c.customer_id = o.customer_id
 GROUP BY c.customer_id, c.name;
 
-what ever the id's matching from left and right , count only those rows. 
+what ever the ids matching from left and right , count only those rows. 
 
 Revenue per customer
 
